@@ -16,20 +16,21 @@ func (app *application) routes() http.Handler{
 	FileServer := http.FileServer(http.Dir("./ui/static/"))
 	router.Handler(http.MethodGet,"/static/*filepath",http.StripPrefix("/static",FileServer))
 
-	dynamic := alice.New(app.sessionManager.LoadAndSave)
+	dynamic := alice.New(app.sessionManager.LoadAndSave,noSrf)
 
 	router.Handler(http.MethodGet,"/",dynamic.ThenFunc(app.home))
 	
 	router.Handler(http.MethodGet,"/snippet/view/:id",dynamic.ThenFunc(app.view))
-	router.Handler(http.MethodGet,"/snippet/create",dynamic.ThenFunc(app.create))
-	router.Handler(http.MethodPost,"/snippet/create",dynamic.ThenFunc(app.createPost))
-
-
 	router.Handler(http.MethodGet,"/user/login",dynamic.ThenFunc(app.userlogin))
 	router.Handler(http.MethodPost,"/user/login",dynamic.ThenFunc(app.userloginPost))
 	router.Handler(http.MethodGet,"/user/signup",dynamic.ThenFunc(app.usersignup))
 	router.Handler(http.MethodPost,"/user/signup",dynamic.ThenFunc(app.usersignupPost))
-	router.Handler(http.MethodPost,"/user/logout",dynamic.ThenFunc(app.userlogout))
+	
+	protected:= dynamic.Append(app.requireAuthentication)
+
+	router.Handler(http.MethodGet,"/snippet/create",protected.ThenFunc(app.create))
+	router.Handler(http.MethodPost,"/snippet/create",protected.ThenFunc(app.createPost))
+	router.Handler(http.MethodPost,"/user/logout",protected.ThenFunc(app.userlogout))
 	
 
 
