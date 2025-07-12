@@ -14,6 +14,7 @@ import (
 	// "strconv"
 	"github.com/alexedwards/scs/mysqlstore"
 	"github.com/alexedwards/scs/v2"
+	"github.com/joho/godotenv"
 	"muskiteer.net/internal/models"
 
 	"github.com/go-playground/form/v4"
@@ -36,11 +37,20 @@ type application struct{
 func main(){	
 	errorlog := log.New(os.Stdout,"ERROR\t", log.Ldate| log.Ltime|log.Lshortfile)
 	infolog := log.New(os.Stdout,"INFO\t", log.Ldate| log.Ltime)
+
+	err := godotenv.Load()
+	if err != nil {
+		errorlog.Fatal("Error loading .env file")
+	}
+	log.Println("Environment variables loaded successfully")
 	
 	addr := flag.String("addr",":4000", "network port ")
-	dsn:= flag.String("dsn","web:123456@/snippetbox?parseTime=true","MySQL data source name")	
+	dsn:= os.Getenv("DB_DSN")
+	if dsn == "" {
+		errorlog.Fatal("DB_DSN environment variable is not set")
+	}
 	flag.Parse()
-	db ,err:= openDB(*dsn)
+	db ,err:= openDB(dsn)
 	if err != nil{
 		errorlog.Fatal(err)
 	}
@@ -85,7 +95,8 @@ func main(){
 		}
 
 	infolog.Printf("Starting server on %s", *addr)
-	err = srv.ListenAndServeTLS("./tls/cert.pem","./tls/key.pem")
+	// err = srv.ListenAndServeTLS("./tls/cert.pem","./tls/key.pem")
+	err = srv.ListenAndServe()
 	errorlog.Fatal(err)
 }
 
