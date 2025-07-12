@@ -1,10 +1,6 @@
 -- Create database
 CREATE DATABASE IF NOT EXISTS snippetbox CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- Create user
-CREATE USER IF NOT EXISTS 'web'@'localhost' IDENTIFIED BY '123456';
-GRANT ALL PRIVILEGES ON snippetbox.* TO 'web'@'localhost';
-FLUSH PRIVILEGES;
 
 -- Use the database
 USE snippetbox;

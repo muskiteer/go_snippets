@@ -92,16 +92,41 @@ lets_go/
 
 1. **Clone the Repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/muskiteer/go_snippets
    cd lets_go
    ```
 
-2. **Create the Database**
+2. **Set Up the Database**
+
+   **Step 1: Create Database and Tables**
    ```bash
    mysql -u root -p < db/init.sql
    ```
 
+   **Step 2: Create Database User**
+   
+   Choose your own username and password, then run:
+   ```bash
+   mysql -u root -p -e "
+   CREATE USER IF NOT EXISTS 'your_username'@'localhost' IDENTIFIED BY 'your_password';
+   GRANT ALL PRIVILEGES ON snippetbox.* TO 'your_username'@'localhost';
+   FLUSH PRIVILEGES;"
+   ```
+
+   **Example with default credentials:**
+   ```bash
+   mysql -u root -p -e "
+   CREATE USER IF NOT EXISTS 'web'@'localhost' IDENTIFIED BY '123456';
+   GRANT ALL PRIVILEGES ON snippetbox.* TO 'web'@'localhost';
+   FLUSH PRIVILEGES;"
+   ```
+
 3. **Create a `.env` file in the root**
+   ```env
+   DB_DSN=your_username:your_password@/snippetbox?parseTime=true
+   ```
+   
+   **Example with default credentials:**
    ```env
    DB_DSN=web:123456@/snippetbox?parseTime=true
    ```
@@ -135,21 +160,72 @@ lets_go/
    cd lets_go
    ```
 
-2. **Run with Docker Compose**
+2. **Configure Database Credentials (Optional)**
+
+   **Option A: Use Default Credentials**
+   
+   No configuration needed. Uses these defaults:
+   - Database: `snippetbox`
+   - Username: `web`
+   - Password: `123456`
+   - Root Password: `root`
+
+   **Option B: Custom Credentials with .env File**
+   
+   Create a `.env` file in the project root:
+   ```env
+   # Database Configuration
+   DB_NAME=snippetbox
+   DB_USER=your_username
+   DB_PASSWORD=your_password
+   MYSQL_ROOT_PASSWORD=your_root_password
+   ```
+
+   **Option C: Set Environment Variables**
+   ```bash
+   export DB_NAME=snippetbox
+   export DB_USER=your_username
+   export DB_PASSWORD=your_password
+   export MYSQL_ROOT_PASSWORD=your_root_password
+   ```
+
+3. **Run with Docker Compose**
    ```bash
    docker-compose up --build
    ```
 
-3. **Open Your Browser**
+4. **Open Your Browser**
    
    Visit: http://localhost:4000
 
 **The Docker setup includes:**
 - Go backend server (auto-built from source)
 - MariaDB container with preloaded schema from `db/init.sql`
+- Automatic user creation based on your configuration
 - No need to install Go or MySQL manually!
 
----
+#### 🔄 Managing Docker Environment
+
+**Stop the application:**
+```bash
+docker-compose down
+```
+
+**Reset database (removes all data):**
+```bash
+docker-compose down -v
+docker-compose up --build
+```
+
+**View logs:**
+```bash
+# All services
+docker-compose logs
+
+# Specific service
+docker-compose logs app
+docker-compose logs mariadb
+```
 
 ## 🔐 Optional: Enable TLS (HTTPS)
 

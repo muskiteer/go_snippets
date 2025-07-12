@@ -1,2 +1,3 @@
 tls/
 cmd/web/.env
+.env
