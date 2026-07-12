@@ -38,11 +38,11 @@ func main(){
 	errorlog := log.New(os.Stdout,"ERROR\t", log.Ldate| log.Ltime|log.Lshortfile)
 	infolog := log.New(os.Stdout,"INFO\t", log.Ldate| log.Ltime)
 
-	err := godotenv.Load()
-	if err != nil {
-		errorlog.Fatal("Error loading .env file")
+	if err := godotenv.Load(); err != nil {
+		infolog.Println("No .env file found, using environment variables")
+	} else {
+		log.Println("Environment variables loaded successfully")
 	}
-	log.Println("Environment variables loaded successfully")
 	
 	addr := flag.String("addr",":4000", "network port ")
 	dsn:= os.Getenv("DB_DSN")
