@@ -34,7 +34,7 @@ func (m *UserModel) Insert(name,email,password string) error{
 	if err != nil{
 		var mySQLError *mysql.MySQLError
 		if errors.As(err,&mySQLError){
-			if mySQLError.Number==1062 && strings.Contains(mySQLError.Message,"users_uc_email"){
+			if mySQLError.Number==1062{
 				return ErrDuplicateEmaiil
 			}
 		}
